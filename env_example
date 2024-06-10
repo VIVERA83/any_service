@@ -1,0 +1,5 @@
+# Minio settings
+MINIO_PORT_1="9000"
+MINIO_PORT_2="9001"
+MINIO_ROOT_USER="test_user"
+MINIO_ROOT_PASSWORD="test_pass"
