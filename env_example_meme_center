@@ -1,0 +1,26 @@
+# Uvicorn settings
+PORT=8005
+HOST=0.0.0.0
+LOG_LEVEL=INFO
+WORKERS=1
+RELOAD="True"
+
+# Application settings
+APP_HOST=${HOST}
+APP_PORT=${PORT}
+
+# Settings logging
+LEVEL="INFO"
+GURU="True"
+TRACEBACK="True"
+
+# File settings
+SIZE=524288000
+
+# Settings for PostgresSQL database connections
+POSTGRES_DB="test_db"
+POSTGRES_USER="test_user"
+POSTGRES_PASSWORD="test_password"
+POSTGRES_HOST="0.0.0.0"
+POSTGRES_PORT="5432"
+POSTGRES_SCHEMA="meme_center"
