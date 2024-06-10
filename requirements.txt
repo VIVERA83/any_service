@@ -1,0 +1,5 @@
+fastapi==0.111.0
+pydantic_settings==2.3.1
+asyncpg==0.29.0
+sqlalchemy==2.0.30
+loguru==0.7.2
