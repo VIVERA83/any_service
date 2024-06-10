@@ -12,5 +12,5 @@ ___
 
 Запуск приложения в docker контейнере
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
