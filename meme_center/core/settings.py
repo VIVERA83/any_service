@@ -77,7 +77,7 @@ class AppSettings(Base):
     openapi_url: str = "/openapi.json"
 
     app_host: str = "0.0.0.0"
-    app_port: int = 8005
+    app_port: int = 8006
 
     @property
     def base_url(self) -> str:
@@ -103,7 +103,7 @@ class LogSettings(Base):
 
 
 class FileSettings(Base):
-    size: int = 1024 * 1024 * 10
+    size: int = 1024 * 1024 * 1
 
 
 class PostgresSettings(Base):
