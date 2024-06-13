@@ -2,7 +2,7 @@
 
 import os
 
-from pydantic import SecretStr, field_validator
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
 from base.base_helper import LOG_LEVEL
@@ -106,50 +106,6 @@ class FileSettings(Base):
     size: int = 1024 * 1024 * 1
 
 
-class PostgresSettings(Base):
-    """Settings for PostgresSQL database connections.
-
-    Attributes:
-        postgres_db: The name of the database.
-        postgres_user: The username for the database.
-        postgres_password: The password for the database.
-        postgres_host: The hostname or IP address of the database server.
-        postgres_port: The port number of the database server.
-        postgres_schema: The name of the schema to use.
-
-    Methods:
-        dsn: Returns the connection URL as a string.
-    """
-
-    postgres_db: str
-    postgres_user: str
-    postgres_password: SecretStr
-    postgres_host: str
-    postgres_port: str
-    postgres_schema: str
-
-    def dsn(self, show_secret: bool = False) -> str:
-        """Returns the connection URL as a string.
-
-        Args:
-            show_secret (bool, optional): Whether to show the secret. Defaults to False.
-
-        Returns:
-            str: The connection URL.
-        """
-        return "postgresql+asyncpg://{user}:{password}@{host}:{port}/{db}".format(
-            user=self.postgres_user,
-            password=(
-                self.postgres_password.get_secret_value()
-                if show_secret
-                else self.postgres_password
-            ),
-            host=self.postgres_host,
-            port=self.postgres_port,
-            db=self.postgres_db,
-        )
-
-
 class MinioSettings(Base):
     """Settings for Minio database connections."""
 
@@ -158,4 +114,3 @@ class MinioSettings(Base):
     minio_secret_key: str = "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG"
     minio_port: int = 9000
     minio_bucket_name: str = "helloworld"
-    minio_temporary_directory: str = "s3_temp"
