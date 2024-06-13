@@ -66,9 +66,11 @@ class AppSettings(Base):
     """
 
     title: str = "Mem Center"
-    description: str = ("In this service, you can generate a 'quick meme',"
-                        " create an image based on ready-made templates, "
-                        "or upload your own.")
+    description: str = (
+        "In this service, you can generate a 'quick meme',"
+        " create an image based on ready-made templates, "
+        "or upload your own."
+    )
     version: str = "0.0.1"
     docs_url: str = "/docs"
     redoc_url: str = "/redoc"

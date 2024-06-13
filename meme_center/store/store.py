@@ -1,4 +1,5 @@
 """A module describing services for working with data."""
+
 from store.database.postgres import Postgres
 
 
