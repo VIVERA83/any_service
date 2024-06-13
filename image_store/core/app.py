@@ -4,7 +4,6 @@ from fastapi import FastAPI
 from fastapi import Request as FastAPIRequest
 
 from core.settings import AppSettings
-from store.database.postgres import Postgres
 from store.store import Store
 
 
@@ -19,14 +18,12 @@ class Application(FastAPI):
         settings (AppSettings): The application settings.
         logger (logging.Logger): The application logger.
         docs_url (str): The URL of the documentation.
-        postgres (Postgres): The database instance.
     """
 
     store: Store
     settings: AppSettings
     logger: logging.Logger
     docs_url: str
-    postgres: Postgres
 
 
 class Request(FastAPIRequest):
