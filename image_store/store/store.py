@@ -1,5 +1,7 @@
 """A module describing services for working with data."""
+
 from store.database.postgres import Postgres
+from store.database.minio import MinioAccessor
 
 
 class Store:
@@ -11,6 +13,7 @@ class Store:
         Args:
             app: The application
         """
+        self.minio = MinioAccessor(app)
 
 
 def setup_store(app):

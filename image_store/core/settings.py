@@ -66,9 +66,11 @@ class AppSettings(Base):
     """
 
     title: str = "Mem Center"
-    description: str = ("In this service, you can generate a 'quick meme',"
-                        " create an image based on ready-made templates, "
-                        "or upload your own.")
+    description: str = (
+        "In this service, you can generate a 'quick meme',"
+        " create an image based on ready-made templates, "
+        "or upload your own."
+    )
     version: str = "0.0.1"
     docs_url: str = "/docs"
     redoc_url: str = "/redoc"
@@ -101,7 +103,7 @@ class LogSettings(Base):
 
 
 class FileSettings(Base):
-    size: int = 1024 * 1024 * 10
+    size: int = 1024 * 1024 * 1
 
 
 class PostgresSettings(Base):
@@ -146,3 +148,14 @@ class PostgresSettings(Base):
             port=self.postgres_port,
             db=self.postgres_db,
         )
+
+
+class MinioSettings(Base):
+    """Settings for Minio database connections."""
+
+    minio_endpoint: str = "play.min.io"
+    minio_access_key: str = "Q3AM3UQ867SPQQA43P2F"
+    minio_secret_key: str = "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG"
+    minio_port: int = 9000
+    minio_bucket_name: str = "helloworld"
+    minio_temporary_directory: str = "s3_temp"

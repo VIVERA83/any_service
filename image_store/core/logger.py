@@ -31,4 +31,3 @@ def setup_logging() -> logging.Logger:
     loger = logging.getLogger(__name__)
     logging.info("Logging with logging.basicConfig")
     return loger
-
