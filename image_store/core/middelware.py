@@ -33,7 +33,7 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
         )
 
     async def dispatch(
-            self, request: FastApiRequest, call_next: RequestResponseEndpoint
+        self, request: FastApiRequest, call_next: RequestResponseEndpoint
     ) -> Response:
         """Dispatch the request to the next middleware or the application.
 
@@ -91,7 +91,7 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
 
 
 async def validation_exception_handler(
-        _: FastApiRequest, exc: RequestValidationError
+    _: FastApiRequest, exc: RequestValidationError
 ) -> JSONResponse:
     """Custom exception handler for FastAPI RequestValidationError.
 
@@ -110,12 +110,12 @@ async def validation_exception_handler(
     )
 
 
-async def value_error_exception_handler(_: FastApiRequest, exc: ValueError) -> JSONResponse:
+async def value_error_exception_handler(
+    _: FastApiRequest, exc: ValueError
+) -> JSONResponse:
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
-        content=jsonable_encoder(
-            {"detail": "Bad request", "message": str(exc)}
-        ),
+        content=jsonable_encoder({"detail": "Bad request", "message": str(exc)}),
     )
 
 

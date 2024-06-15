@@ -1,6 +1,5 @@
 """A module describing services for working with data."""
 
-
 from store.database.minio import MinioAccessor
 
 

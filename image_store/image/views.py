@@ -1,5 +1,7 @@
 from typing import Any
 
+from icecream import ic
+
 from .helper import s3_upload_image, s3_stream_image, s3_delete_image
 from .schemas import UploadFileSchema, OkSchema
 
@@ -18,8 +20,9 @@ async def upload_image(request: "Request", file: UploadFileSchema) -> Any:
     return OkSchema()
 
 
-@image_route.post("/download",
-                  )
+@image_route.post(
+    "/download",
+)
 async def download(request: "Request", file_name: str) -> Any:
     return await s3_stream_image(request, file_name)
 

@@ -1,6 +1,8 @@
 """A module describing services for working with data."""
 
 from store.database.postgres import Postgres
+from store.memes.accessor import MemAccessor
+from store.s3.accessor import S3Accessor
 
 
 class Store:
@@ -12,6 +14,8 @@ class Store:
         Args:
             app: The application
         """
+        self.memes = MemAccessor(app)
+        self.s3 = S3Accessor(app)
 
 
 def setup_store(app):

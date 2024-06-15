@@ -1,7 +1,7 @@
 from logging import Logger
 from typing import Optional
 
-from core.components import Application
+from core.app import Application
 
 class BaseAccessor:
     """

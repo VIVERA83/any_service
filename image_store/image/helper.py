@@ -26,7 +26,8 @@ async def s3_stream_image(request: "Request", object_name: str) -> StreamingResp
 async def s3_delete_image(request: "Request", object_name: str):
     await request.app.store.minio.client.remove_object(
         bucket_name=request.app.store.minio.settings.minio_bucket_name,
-        object_name=object_name)
+        object_name=object_name,
+    )
 
 
 async def _async_request(request: "Request", object_name: str):
@@ -36,11 +37,8 @@ async def _async_request(request: "Request", object_name: str):
             object_name=object_name,
             session=client,
         )
-
-    if response.status == 404:
-        raise S3Error(404, "Object not found")
-    async for chunk in response.content:
-        yield chunk
+        async for chunk in response.content:
+            yield chunk
 
 
 def _create_headers(filename: str) -> dict:

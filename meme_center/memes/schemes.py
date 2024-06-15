@@ -72,7 +72,7 @@ class UploadFileSchema(UploadFile):
 
     @classmethod
     def __get_pydantic_json_schema__(
-            cls, _: CoreSchema, __: GetJsonSchemaHandler
+        cls, _: CoreSchema, __: GetJsonSchemaHandler
     ) -> JsonSchemaValue:
         """
         Define the JSON schema for this model.
@@ -89,7 +89,7 @@ class UploadFileSchema(UploadFile):
 
     @classmethod
     def __get_pydantic_core_schema__(
-            cls, _: Type[Any], __r: Callable[[Any], CoreSchema]
+        cls, _: Type[Any], __r: Callable[[Any], CoreSchema]
     ) -> CoreSchema:
         """
         Define the Core schema for this model.

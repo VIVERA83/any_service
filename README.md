@@ -14,3 +14,16 @@ ___
 ```bash
 docker compose up --build
 ```
+
+```bash
+cd meme_center 
+alembic init -t async alembic
+```
+```bash
+cd meme_center 
+alembic revision --autogenerate -m "Initial tables"
+```
+```bash
+cd meme_center
+alembic upgrade head
+```

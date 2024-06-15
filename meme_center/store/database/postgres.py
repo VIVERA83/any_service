@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from typing import Optional, Type
+from tkinter.tix import Select
+from typing import Optional, Type, Union, TypeVar, Any
 
 from base.base_accessor import BaseAccessor
 from core.settings import PostgresSettings
@@ -9,12 +10,22 @@ from sqlalchemy import (
     MetaData,
     func,
     text,
+    ValuesBase,
+    UpdateBase,
+    Delete,
+    Insert,
+    insert,
+    TextClause,
+    Result,
 )
 from sqlalchemy.dialects.postgresql import UUID
 
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy.orm.decl_api import MappedAsDataclass
+from sqlalchemy.orm.decl_api import MappedAsDataclass, DeclarativeAttributeIntercept
+
+Query = Union[ValuesBase, Select, UpdateBase, Delete, Insert]
+Model = TypeVar("Model", bound=DeclarativeAttributeIntercept)
 
 
 @dataclass
@@ -96,3 +107,30 @@ class Postgres(BaseAccessor):
             AsyncSession: the async session for the database
         """
         return AsyncSession(self._engine, expire_on_commit=False)
+
+    @staticmethod
+    def get_query_insert(model: Model, **insert_data) -> Query:
+        """Get query inserted.
+
+        Args:
+            model: Table model
+            insert_data: fields for insert dict[name, value]
+
+        Returns:
+        object: query
+        """
+        return insert(model).values(**insert_data)
+
+    async def query_execute(self, query: Union[Query, TextClause]) -> Result[Any]:
+        """Query execute.
+
+        Args:
+            query: CRUD query for Database
+
+        Returns:
+              Any: result of query
+        """
+        async with self.session.begin().session as session:
+            result = await session.execute(query)
+            await session.commit()
+            return result

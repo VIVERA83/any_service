@@ -2,4 +2,8 @@ fastapi==0.111.0
 pydantic_settings==2.3.1
 asyncpg==0.29.0
 sqlalchemy==2.0.30
+filetype==1.2.0
 loguru==0.7.2
+miniopy_async==1.19
+aiofiles==23.2.1
+alembic==1.13.1

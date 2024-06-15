@@ -148,3 +148,15 @@ class PostgresSettings(Base):
             port=self.postgres_port,
             db=self.postgres_db,
         )
+
+
+class S3Settings(Base):
+    """Settings for S3 bucket connections.
+
+    Attributes:
+        s3_host: The hostname or IP address of the S3 server.
+        s3_port: The port number of the S3 server.
+    """
+
+    s3_host: str
+    s3_port: int
