@@ -4,7 +4,6 @@ from core.app import Application
 from core.logger import setup_logging
 from core.middelware import setup_middleware
 from core.routes import setup_routes
-
 from core.settings import AppSettings
 from store.store import setup_store
 

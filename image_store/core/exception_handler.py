@@ -1,11 +1,10 @@
 import traceback
 from logging import Logger
 
+from base.base_helper import HTTP_EXCEPTION, LOG_LEVEL
 from httpcore import URL
 from starlette import status
 from starlette.responses import JSONResponse
-
-from base.base_helper import HTTP_EXCEPTION, LOG_LEVEL
 
 
 class ExceptionHandler:

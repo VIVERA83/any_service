@@ -2,10 +2,9 @@
 
 import os
 
+from base.base_helper import LOG_LEVEL
 from pydantic import field_validator
 from pydantic_settings import BaseSettings
-
-from base.base_helper import LOG_LEVEL
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__name__)))
 

@@ -1,12 +1,10 @@
 from typing import Any
 
-from icecream import ic
-
-from .helper import s3_upload_image, s3_stream_image, s3_delete_image
-from .schemas import UploadFileSchema, OkSchema
-
 from core.app import Request
 from fastapi import APIRouter
+
+from .helper import s3_delete_image, s3_stream_image, s3_upload_image
+from .schemas import OkSchema, UploadFileSchema
 
 image_route = APIRouter()
 

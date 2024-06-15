@@ -1,10 +1,7 @@
 import aiohttp
-from miniopy_async import S3Error
-
-from starlette.responses import StreamingResponse
-
 from core.app import Request
 from image.schemas import UploadFileSchema
+from starlette.responses import StreamingResponse
 
 
 async def s3_upload_image(request: "Request", file: UploadFileSchema):
@@ -16,13 +13,6 @@ async def s3_upload_image(request: "Request", file: UploadFileSchema):
     )
 
 
-async def s3_stream_image(request: "Request", object_name: str) -> StreamingResponse:
-    return StreamingResponse(
-        content=_async_request(request, object_name),
-        headers=_create_headers(object_name),
-    )
-
-
 async def s3_delete_image(request: "Request", object_name: str):
     await request.app.store.minio.client.remove_object(
         bucket_name=request.app.store.minio.settings.minio_bucket_name,
@@ -30,15 +20,23 @@ async def s3_delete_image(request: "Request", object_name: str):
     )
 
 
-async def _async_request(request: "Request", object_name: str):
-    async with aiohttp.ClientSession() as client:
-        response = await request.app.store.minio.client.get_object(
-            bucket_name=request.app.store.minio.settings.minio_bucket_name,
-            object_name=object_name,
-            session=client,
-        )
+async def s3_stream_image(request: "Request", object_name: str) -> StreamingResponse:
+    session = aiohttp.ClientSession()
+    response = await request.app.store.minio.client.get_object(
+        bucket_name=request.app.store.minio.settings.minio_bucket_name,
+        object_name=object_name,
+        session=session,
+    )
+
+    async def stream_iterator():
         async for chunk in response.content:
             yield chunk
+        await session.close()
+
+    return StreamingResponse(
+        content=stream_iterator(),
+        headers=_create_headers(object_name),
+    )
 
 
 def _create_headers(filename: str) -> dict:

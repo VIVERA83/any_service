@@ -1,5 +1,8 @@
 import re
 
+from core.app import Application
+from core.exception_handler import ExceptionHandler
+from core.settings import LogSettings
 from fastapi import Request as FastApiRequest
 from fastapi import Response, status
 from fastapi.encoders import jsonable_encoder
@@ -7,10 +10,6 @@ from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.types import ASGIApp
-
-from core.app import Application
-from core.exception_handler import ExceptionHandler
-from core.settings import LogSettings
 
 
 class ErrorHandlingMiddleware(BaseHTTPMiddleware):
@@ -25,8 +24,8 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
         exception_handler (ExceptionHandler): The exception handler.
     """
 
-    def __init__(self, app: ASGIApp):
-        super().__init__(app)
+    def __init__(self, app: ASGIApp, *args, **kwargs):
+        super().__init__(app, *args, **kwargs)
         self.settings = LogSettings()
         self.exception_handler = ExceptionHandler(
             self.settings.level, self.settings.traceback
@@ -110,15 +109,6 @@ async def validation_exception_handler(
     )
 
 
-async def value_error_exception_handler(
-    _: FastApiRequest, exc: ValueError
-) -> JSONResponse:
-    return JSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        content=jsonable_encoder({"detail": "Bad request", "message": str(exc)}),
-    )
-
-
 def setup_middleware(app: Application):
     """Sets up the middleware for the FastAPI application.
 
@@ -130,5 +120,3 @@ def setup_middleware(app: Application):
     """
     app.exception_handler(RequestValidationError)(validation_exception_handler)
     app.add_middleware(ErrorHandlingMiddleware)
-    print(value_error_exception_handler, app)
-    # app.add_middleware(ValueError)(value_error_exception_handler)

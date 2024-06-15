@@ -1,7 +1,8 @@
 from typing import Optional
+
 from base.base_accessor import BaseAccessor
-from miniopy_async import Minio
 from core.settings import MinioSettings
+from miniopy_async import Minio
 
 
 class MinioAccessor(BaseAccessor):
