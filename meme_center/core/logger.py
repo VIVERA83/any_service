@@ -1,9 +1,8 @@
 import logging
 import sys
 
-from loguru import logger
-
 from core.settings import LogSettings
+from loguru import logger
 
 
 def setup_logging() -> logging.Logger:

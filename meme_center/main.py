@@ -1,7 +1,6 @@
 """The application launcher."""
 
 import uvicorn
-
 from core.settings import UvicornSettings
 
 if __name__ == "__main__":

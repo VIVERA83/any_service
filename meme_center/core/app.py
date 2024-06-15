@@ -1,9 +1,8 @@
 import logging
 
+from core.settings import AppSettings
 from fastapi import FastAPI
 from fastapi import Request as FastAPIRequest
-
-from core.settings import AppSettings
 from store.database.postgres import Postgres
 from store.store import Store
 

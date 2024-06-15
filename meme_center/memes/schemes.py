@@ -1,21 +1,31 @@
-from typing import Any, Callable, Type
+from datetime import datetime
+from typing import Any, Callable, Type, Union
 from uuid import UUID
 
 import filetype
-from fastapi import File
-from pydantic import GetJsonSchemaHandler, BaseModel, Field
+from core.settings import FileSettings
+from fastapi import File, Query
+from pydantic import BaseModel, Field, GetJsonSchemaHandler, ConfigDict
 from pydantic.json_schema import JsonSchemaValue
-
 from pydantic_core import CoreSchema
 from pydantic_core.core_schema import with_info_plain_validator_function
 from starlette.datastructures import UploadFile
 
-from core.settings import FileSettings
-
 ID: Type[UUID] = Field(
-    required=True,
-    example="1595c2fc-397a-40c9-8105-a4d2f0a33a7a",
+    default=UUID("1595c2fc-397a-40c9-8105-a4d2f0a33a7a"),
     description="unique indicator of meme",
+)
+PAGE = Query(
+    ge=1,
+    default=1,
+    required=False,
+    description="page number",
+)
+PAGE_SIZE = Query(
+    ge=1,
+    le=100,
+    default=10,
+    description="page size",
 )
 
 
@@ -121,3 +131,10 @@ class OkSchema(BaseModel):
 
     status: str = "Оk"
     message: str = "The request was successful."
+
+
+class MemeSchema(BaseModel):
+    id: UUID
+    title: str
+    # image: bytes
+    model_config = ConfigDict(from_attributes=True)

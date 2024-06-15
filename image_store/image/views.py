@@ -21,8 +21,8 @@ async def upload_image(request: "Request", file: UploadFileSchema) -> Any:
 @image_route.post(
     "/download",
 )
-async def download(request: "Request", file_name: str) -> Any:
-    return await s3_stream_image(request, file_name)
+async def download(request: "Request", meme_id: str) -> Any:
+    return await s3_stream_image(request, meme_id)
 
 
 @image_route.post("/remove")

@@ -15,6 +15,3 @@ class Store:
         Args:
             app (Application): The main application component.
         """
-
-def setup_store(app: Application):
-    app.store = Store(app)

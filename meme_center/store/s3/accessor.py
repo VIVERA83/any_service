@@ -3,10 +3,11 @@ from typing import Optional
 from urllib.parse import urlencode
 
 import aiohttp
-from icecream import ic
+from starlette.responses import StreamingResponse
 
 from base.base_accessor import BaseAccessor
 from core.settings import S3Settings
+from icecream import ic
 
 
 class S3Accessor(BaseAccessor):
@@ -50,10 +51,12 @@ class S3Accessor(BaseAccessor):
     async def upload(self, filename: str, file_content: bytes):
         async with self.session() as session:
             async with session.post(
-                url=self.__create_url("upload"),
-                data=self.__create_form_data(filename, file_content),
+                    url=self.__create_url("upload"),
+                    data=self.__create_form_data(filename, file_content),
             ):
                 await session.close()
 
-    async def download_file(self, file_name: str) -> Optional[bytes]:
-        pass
+    async def download(self, meme_id: str):
+        session = self.session()
+        response = await session.post(url=self.__create_url("download", meme_id=meme_id))
+        return response.content

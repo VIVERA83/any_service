@@ -1,28 +1,28 @@
 from dataclasses import dataclass
 from tkinter.tix import Select
-from typing import Optional, Type, Union, TypeVar, Any
+from typing import Any, Optional, Type, TypeVar, Union
 
 from base.base_accessor import BaseAccessor
 from core.settings import PostgresSettings
 from sqlalchemy import (
     DATETIME,
     TIMESTAMP,
-    MetaData,
-    func,
-    text,
-    ValuesBase,
-    UpdateBase,
     Delete,
     Insert,
-    insert,
-    TextClause,
+    MetaData,
     Result,
+    TextClause,
+    UpdateBase,
+    ValuesBase,
+    func,
+    insert,
+    text,
+    select,
 )
 from sqlalchemy.dialects.postgresql import UUID
-
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy.orm.decl_api import MappedAsDataclass, DeclarativeAttributeIntercept
+from sqlalchemy.orm.decl_api import DeclarativeAttributeIntercept, MappedAsDataclass
 
 Query = Union[ValuesBase, Select, UpdateBase, Delete, Insert]
 Model = TypeVar("Model", bound=DeclarativeAttributeIntercept)
@@ -120,6 +120,18 @@ class Postgres(BaseAccessor):
         object: query
         """
         return insert(model).values(**insert_data)
+
+    @staticmethod
+    def get_query_select(model: Model) -> Query:
+        """Get query select.
+
+        Args:
+            model: Table model
+
+        Returns:
+            object: query
+        """
+        return select(model)
 
     async def query_execute(self, query: Union[Query, TextClause]) -> Result[Any]:
         """Query execute.
