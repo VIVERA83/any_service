@@ -77,7 +77,6 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
                     return True
                 status_code = status.HTTP_405_METHOD_NOT_ALLOWED
                 message = "Method Not Allowed"
-                break
         raise HTTPException(
             status_code,
             detail.format(
