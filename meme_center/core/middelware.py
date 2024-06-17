@@ -1,5 +1,7 @@
 import re
 
+from icecream import ic
+
 from core.app import Application
 from core.exception_handler import ExceptionHandler
 from core.settings import LogSettings
@@ -75,9 +77,8 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
             if re.match(route.path_regex, request.url.path):
                 if request.method.upper() in route.methods:
                     return True
-                status_code = status.HTTP_405_METHOD_NOT_ALLOWED
-                message = "Method Not Allowed"
-                break
+            status_code = status.HTTP_405_METHOD_NOT_ALLOWED
+            message = "Method Not Allowed"
         raise HTTPException(
             status_code,
             detail.format(
