@@ -11,7 +11,7 @@ from icecream import ic
 
 
 class S3Accessor(BaseAccessor):
-    BASE_PATH: str = "0.0.0.0"
+    BASE_PATH: str = "127.0.0.1"
     settings: S3Settings = None
 
     async def connect(self):
@@ -51,7 +51,7 @@ class S3Accessor(BaseAccessor):
     async def upload(self, filename: str, file_content: bytes):
         async with self.session() as session:
             async with session.post(
-                    url=self.__create_url("upload"),
+                    url=ic(self.__create_url("upload")),
                     data=self.__create_form_data(filename, file_content),
             ):
                 await session.close()
@@ -59,4 +59,20 @@ class S3Accessor(BaseAccessor):
     async def download(self, meme_id: str):
         session = self.session()
         response = await session.post(url=self.__create_url("download", meme_id=meme_id))
-        return response.content
+
+        async def stream_iterator():
+            async for chunk in response.content:
+                yield chunk
+            await session.close()
+
+        return StreamingResponse(
+            content=stream_iterator(),
+            headers=self._create_headers(meme_id + ".jpg"),
+        )
+
+    @staticmethod
+    def _create_headers(filename: str) -> dict:
+        return {
+            "Content-Disposition": f"attachment filename={filename}",
+            "Content-type": "image/jpeg",
+        }

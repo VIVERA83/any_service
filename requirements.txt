@@ -7,3 +7,4 @@ loguru==0.7.2
 miniopy_async==1.19
 aiofiles==23.2.1
 alembic==1.13.1
+icecream==2.1.3

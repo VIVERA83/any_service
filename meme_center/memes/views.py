@@ -33,10 +33,7 @@ async def list_memes(
 )
 async def get_meme_by_id(request: "Request", id: Annotated[UUID, ID]) -> Any:
     if meme := await request.app.store.memes.get_meme_by_id(id.hex):
-        return StreamingResponse(
-            content=await request.app.store.s3.download(str(id)),
-            headers=_create_headers(f"{meme.title}.jpg"),
-        )
+        return await request.app.store.s3.download(str(meme.id))
     raise KeyError(f"Meme for id {id} not found")
 
 
@@ -47,6 +44,7 @@ async def get_meme_by_id(request: "Request", id: Annotated[UUID, ID]) -> Any:
     response_model=OkSchema,
 )
 async def add_meme(request: "Request", file: UploadFileSchema, text: str) -> Any:
+    request.app.logger.warning(request.url)
     meme = await request.app.store.memes.create_meme(text)
     await request.app.store.s3.upload(str(meme.id), file.file.read())
     return OkSchema(message="Мем добавлен, id: " + str(meme.id))
@@ -55,10 +53,3 @@ async def add_meme(request: "Request", file: UploadFileSchema, text: str) -> Any
 @memes_route.put("/{id}", response_model=OkSchema)
 async def list_memes(request: "Request", id: Annotated[UUID, ID]) -> Any:
     return OkSchema()
-
-
-def _create_headers(filename: str) -> dict:
-    return {
-        "Content-Disposition": f"attachment filename={filename}",
-        "Content-type": "image/jpeg",
-    }
