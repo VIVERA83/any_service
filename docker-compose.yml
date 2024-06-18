@@ -63,7 +63,7 @@ services:
     depends_on:
       - minio
     volumes:
-      - ./image_store:/meme_center
+      - ./image_store:/image_store
 volumes:
   minio-storage:
   postgres_storage:
