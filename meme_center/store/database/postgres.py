@@ -18,6 +18,7 @@ from sqlalchemy import (
     insert,
     text,
     select,
+    update,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
@@ -132,6 +133,10 @@ class Postgres(BaseAccessor):
             object: query
         """
         return select(model)
+
+    @staticmethod
+    def get_query_update(model: Model, **update_data) -> Query:
+        return update(model).values(**update_data)
 
     async def query_execute(self, query: Union[Query, TextClause]) -> Result[Any]:
         """Query execute.

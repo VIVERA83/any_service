@@ -1,9 +1,10 @@
 from typing import Any
+from uuid import UUID
 
 from core.app import Request
 from fastapi import APIRouter
 
-from .helper import s3_delete_image, s3_stream_image, s3_upload_image
+from .helper import s3_delete_image, s3_stream_image, s3_upload_image, s3_update_image
 from .schemas import OkSchema, UploadFileSchema
 
 image_route = APIRouter()
@@ -18,14 +19,18 @@ async def upload_image(request: "Request", file: UploadFileSchema) -> Any:
     return OkSchema()
 
 
-@image_route.post(
-    "/download",
-)
+@image_route.post("/download")
 async def download(request: "Request", meme_id: str) -> Any:
     return await s3_stream_image(request, meme_id)
 
 
-@image_route.post("/remove")
+@image_route.delete("/remove")
 async def remove(request: "Request", file_name: str) -> Any:
     await s3_delete_image(request, file_name)
+    return OkSchema()
+
+
+@image_route.put("/update")
+async def update(request: "Request", meme_id: UUID) -> Any:
+    await s3_update_image(request, meme_id.hex)
     return OkSchema()

@@ -1,11 +1,8 @@
 from typing import Annotated, Any
 from uuid import UUID
 
-from icecream import ic
-from starlette.responses import StreamingResponse
-
 from core.app import Request
-from fastapi import APIRouter
+from fastapi import APIRouter, File, Form
 
 from memes.schemes import ID, OkSchema, UploadFileSchema, PAGE, PAGE_SIZE, MemeSchema
 
@@ -29,7 +26,8 @@ async def list_memes(
 
 @memes_route.get(
     "/{id}",
-    # response_model=MemeSchema,
+    summary="получить мем по id",
+    description="Получить данные о меме по его id "
 )
 async def get_meme_by_id(request: "Request", id: Annotated[UUID, ID]) -> Any:
     if meme := await request.app.store.memes.get_meme_by_id(id.hex):
@@ -43,13 +41,27 @@ async def get_meme_by_id(request: "Request", id: Annotated[UUID, ID]) -> Any:
     description="Добавить новый мем (с картинкой и текстом)",
     response_model=OkSchema,
 )
-async def add_meme(request: "Request", file: UploadFileSchema, text: str) -> Any:
+async def add_meme(request: "Request",
+                   file: Annotated[UploadFileSchema, File()],
+                   text: Annotated[str, Form()]) -> Any:
     request.app.logger.warning(request.url)
     meme = await request.app.store.memes.create_meme(text)
     await request.app.store.s3.upload(str(meme.id), file.file.read())
     return OkSchema(message="Мем добавлен, id: " + str(meme.id))
 
 
-@memes_route.put("/{id}", response_model=OkSchema)
-async def list_memes(request: "Request", id: Annotated[UUID, ID]) -> Any:
-    return OkSchema()
+@memes_route.put(
+    "/{id}",
+    summary="обновить мем",
+    response_model=OkSchema)
+async def update_mem(request: "Request",
+                     id: Annotated[UUID, UUID],
+                     text: Annotated[str, Form()] = None,
+                     file: Annotated[UploadFileSchema, File()] = None,
+                     ) -> Any:
+    if text:
+        await request.app.store.memes.update_meme(id.hex, text)
+    if file:
+        pass
+
+    return OkSchema(message="Мем успешно облаплен, id: " + str(id))

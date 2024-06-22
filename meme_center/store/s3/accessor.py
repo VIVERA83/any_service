@@ -1,5 +1,3 @@
-import io
-from typing import Optional
 from urllib.parse import urlencode
 
 import aiohttp

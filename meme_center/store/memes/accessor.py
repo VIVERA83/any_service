@@ -27,8 +27,13 @@ class MemAccessor(BaseAccessor):
     async def delete_meme(self, meme_id: UUID):
         return None
 
-    async def update_meme(self, meme_id: UUID):
-        return None
+    async def update_meme(self, meme_id: str, title: str) -> MemeModel:
+        query = (self.app.postgres.get_query_update(MemeModel, title=title)
+                 .where(MemeModel.id == meme_id)
+                 .returning(MemeModel)
+                 )
+        result = await self.app.postgres.query_execute(query)
+        return result.scalars().first()
 
     async def create_meme(self, title: str) -> MemeModel:
         query = self.app.postgres.get_query_insert(MemeModel, title=title).returning(
