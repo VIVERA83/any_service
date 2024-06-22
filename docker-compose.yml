@@ -45,8 +45,8 @@ services:
     ports:
       - 8006:8006
     depends_on:
-        - postgres
-        - minio
+      - postgres
+      - minio
     volumes:
       - ./meme_center:/meme_center
 
@@ -67,4 +67,3 @@ services:
 volumes:
   minio-storage:
   postgres_storage:
-
