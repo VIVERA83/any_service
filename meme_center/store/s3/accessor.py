@@ -49,24 +49,33 @@ class S3Accessor(BaseAccessor):
     async def upload(self, filename: str, file_content: bytes):
         async with self.session() as session:
             async with session.post(
-                    url=ic(self.__create_url("upload")),
-                    data=self.__create_form_data(filename, file_content),
+                url=ic(self.__create_url("upload")),
+                data=self.__create_form_data(filename, file_content),
             ):
                 await session.close()
 
     async def download(self, meme_id: str):
         session = self.session()
-        response = await session.post(url=self.__create_url("download", meme_id=meme_id))
+        response = await session.post(
+            url=self.__create_url("download", meme_id=meme_id)
+        )
 
         async def stream_iterator():
             async for chunk in response.content:
                 yield chunk
             await session.close()
 
+        if response.status != 200:
+            raise KeyError((await response.json()).get("message"))
         return StreamingResponse(
             content=stream_iterator(),
             headers=self._create_headers(meme_id + ".jpg"),
         )
+
+    async def delete(self, meme_id: str):
+        session = self.session()
+        await session.delete(url=self.__create_url("delete", meme_id=meme_id))
+        await session.close()
 
     @staticmethod
     def _create_headers(filename: str) -> dict:

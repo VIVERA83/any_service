@@ -1,20 +1,24 @@
-from datetime import datetime
-from typing import Any, Callable, Type, Union
+from typing import Any, Callable, Type, Annotated
 from uuid import UUID
 
 import filetype
 from core.settings import FileSettings
 from fastapi import File, Query
-from pydantic import BaseModel, Field, GetJsonSchemaHandler, ConfigDict
+from pydantic import BaseModel, GetJsonSchemaHandler, ConfigDict
 from pydantic.json_schema import JsonSchemaValue
 from pydantic_core import CoreSchema
 from pydantic_core.core_schema import with_info_plain_validator_function
 from starlette.datastructures import UploadFile
 
-ID: Type[UUID] = Field(
-    default=UUID("1595c2fc-397a-40c9-8105-a4d2f0a33a7a"),
-    description="unique indicator of meme",
-)
+MEME_ID = Annotated[
+    UUID,
+    Query(
+        alias="id",
+        description="id мема",
+        example="123e4567-e89b-12d3-a456-426614174000",
+    ),
+]
+
 PAGE = Query(
     ge=1,
     default=1,

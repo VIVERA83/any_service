@@ -32,7 +32,7 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
         )
 
     async def dispatch(
-        self, request: FastApiRequest, call_next: RequestResponseEndpoint
+            self, request: FastApiRequest, call_next: RequestResponseEndpoint
     ) -> Response:
         """Dispatch the request to the next middleware or the application.
 
@@ -53,7 +53,9 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
             return response
         except Exception as error:
-            return self.exception_handler(error, request.url, request.app.logger, self.settings.is_traceback)
+            return self.exception_handler(
+                error, request.url, request.app.logger, self.settings.is_traceback
+            )
 
     @staticmethod
     def is_endpoint(request: FastApiRequest) -> bool:
@@ -89,7 +91,7 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
 
 
 async def validation_exception_handler(
-    _: FastApiRequest, exc: RequestValidationError
+        _: FastApiRequest, exc: RequestValidationError
 ) -> JSONResponse:
     """Custom exception handler for FastAPI RequestValidationError.
 

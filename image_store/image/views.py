@@ -24,8 +24,8 @@ async def download(request: "Request", meme_id: str) -> Any:
     return await s3_stream_image(request, meme_id)
 
 
-@image_route.delete("/remove")
-async def remove(request: "Request", file_name: str) -> Any:
+@image_route.delete("/delete")
+async def delete(request: "Request", file_name: str) -> Any:
     await s3_delete_image(request, file_name)
     return OkSchema()
 
