@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from tkinter.tix import Select
+
 from typing import Any, Optional, Type, TypeVar, Union
 
 from base.base_accessor import BaseAccessor
@@ -9,6 +9,7 @@ from sqlalchemy import (
     TIMESTAMP,
     Delete,
     Insert,
+    Select,
     MetaData,
     Result,
     TextClause,
@@ -22,7 +23,12 @@ from sqlalchemy import (
     delete,
 )
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    create_async_engine,
+    async_sessionmaker,
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.orm.decl_api import DeclarativeAttributeIntercept, MappedAsDataclass
 
@@ -99,6 +105,7 @@ class Postgres(BaseAccessor):
         """Closing the connection to the database."""
         if self._engine:
             await self._engine.dispose()
+
         self.logger.info(f"{self.__class__.__name__} disconnected")
 
     @property
@@ -108,7 +115,7 @@ class Postgres(BaseAccessor):
         Returns:
             AsyncSession: the async session for the database
         """
-        return AsyncSession(self._engine, expire_on_commit=False)
+        return async_sessionmaker(bind=self._engine, expire_on_commit=False)()
 
     @staticmethod
     def get_query_insert(model: Model, **insert_data) -> Query:
@@ -152,7 +159,7 @@ class Postgres(BaseAccessor):
         Returns:
               Any: result of query
         """
-        async with self.session.begin().session as session:
+        async with self.session as session:
             result = await session.execute(query)
             await session.commit()
             return result

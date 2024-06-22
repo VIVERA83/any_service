@@ -9,7 +9,6 @@ from store.memes.models import MemeModel
 
 
 def exception_handler(func):
-
     async def wrapper(self, *args, **kwargs):
         try:
             return await func(self, *args, **kwargs)

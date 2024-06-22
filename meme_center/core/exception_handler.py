@@ -32,6 +32,7 @@ class ExceptionHandler:
         url: URL,
         logger: Logger = None,
         is_traceback: bool = False,
+        status_code: int = None,
     ) -> JSONResponse:
         """This method is used to handle an exception.
 
@@ -46,6 +47,9 @@ class ExceptionHandler:
             JSONResponse: A JSON response containing the error details.
         """
         self.exception = exception
+        self.status_code = (
+            status_code if status_code else status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
         self.logger = logger
         self.is_traceback = is_traceback
         self.handler_exception()
@@ -99,7 +103,7 @@ class ExceptionHandler:
 
         if self.exception.args:
             self.message = self.exception.args[0]
-        self.status_code = status.HTTP_400_BAD_REQUEST
+            # self.status_code = status.HTTP_400_BAD_REQUEST
         self.real_message = self.exception.__class__.__name__
         if ex := getattr(self.exception, "exception", False):
             self.real_message = (

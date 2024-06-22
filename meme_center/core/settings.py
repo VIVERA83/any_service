@@ -3,23 +3,24 @@
 import os
 
 from base.base_helper import LOG_LEVEL
-from pydantic import SecretStr, field_validator
+from pydantic import SecretStr, field_validator, ConfigDict
 from pydantic_settings import BaseSettings
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__name__)))
 
 
 class Base(BaseSettings):
-    class Config:
-        """Settings for reading environment variables from a file.
+    """Settings for reading environment variables from a file.
 
-        env_file - The path to the environment, to run locally
-        """
+    env_file - The path to the environment, to run locally
+    """
 
-        env_nested_delimiter = "__"
-        env_file = os.path.join(BASE_DIR, ".env_meme_center")
-        enf_file_encoding = "utf-8"
-        extra = "ignore"
+    model_config = ConfigDict(
+        env_nested_delimiter="__",
+        env_file=os.path.join(BASE_DIR, ".env_meme_center"),
+        enf_file_encoding="utf-8",
+        extra="ignore",
+    )
 
 
 class UvicornSettings(Base):

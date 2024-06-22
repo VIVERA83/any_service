@@ -28,11 +28,12 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
         super().__init__(app, *args, **kwargs)
         self.settings = LogSettings()
         self.exception_handler = ExceptionHandler(
-            self.settings.level, self.settings.traceback
+            self.settings.level,
+            self.settings.traceback,
         )
 
     async def dispatch(
-            self, request: FastApiRequest, call_next: RequestResponseEndpoint
+        self, request: FastApiRequest, call_next: RequestResponseEndpoint
     ) -> Response:
         """Dispatch the request to the next middleware or the application.
 
@@ -54,7 +55,11 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
             return response
         except Exception as error:
             return self.exception_handler(
-                error, request.url, request.app.logger, self.settings.is_traceback
+                error,
+                request.url,
+                request.app.logger,
+                self.settings.is_traceback,
+                getattr(error, "status_code", None),
             )
 
     @staticmethod
@@ -91,7 +96,7 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
 
 
 async def validation_exception_handler(
-        _: FastApiRequest, exc: RequestValidationError
+    _: FastApiRequest, exc: RequestValidationError
 ) -> JSONResponse:
     """Custom exception handler for FastAPI RequestValidationError.
 
