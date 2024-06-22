@@ -53,7 +53,7 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
             return response
         except Exception as error:
-            return self.exception_handler(error, request.url, request.app.logger)
+            return self.exception_handler(error, request.url, request.app.logger, self.settings.is_traceback)
 
     @staticmethod
     def is_endpoint(request: FastApiRequest) -> bool:
