@@ -1,2 +1,1 @@
-from .bot import *
-from .quiz import *
+from .data_base import *

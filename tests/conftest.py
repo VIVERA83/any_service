@@ -1,15 +1,14 @@
 import pytest
 from fastapi.testclient import TestClient
-from icecream import ic
+from sqlalchemy import text
+
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from core.settings import AppSettings, PostgresSettings
+from core.settings import PostgresSettings, S3Settings
+from core.setup import setup_app
 from meme_center.core.app import Application
-from meme_center.core.logger import setup_logging
-from meme_center.core.middelware import setup_middleware
-from meme_center.core.routes import setup_routes
-from meme_center.store.store import setup_store
 from store.database.postgres import Base
+from .fixtures import *
 
 
 def connect_db(app: Application) -> None:
@@ -21,6 +20,21 @@ def connect_db(app: Application) -> None:
         echo=False,
         future=True,
     )
+
+
+def connect_s3(app: Application) -> None:
+    app.store.s3.settings = S3Settings()
+    app.store.s3.BASE_PATH = (
+        f"http://{app.store.s3.settings.s3_host}:{app.store.s3.settings.s3_port}/"
+    )
+
+
+@pytest.fixture(autouse=True)
+async def clean_db(application) -> None:
+    await application.postgres.query_execute(
+        text("TRUNCATE TABLE meme_center.memes cascade;")
+    )
+    await application.postgres._engine.dispose()
 
 
 @pytest.fixture(autouse=True)
@@ -35,21 +49,9 @@ def application() -> Application:
        Returns:
            Application: The main FastAPI application.
        """
-    settings = AppSettings()
-    app = Application(
-        docs_url=settings.docs_url,
-        redoc_url=settings.redoc_url,
-        openapi_url=settings.openapi_url,
-        version=settings.version,
-        title=settings.title,
-        description=settings.description,
-    )
-    app.settings = settings
-    app.logger = setup_logging()
-    setup_store(app)
+    app = setup_app()
     connect_db(app)
-    setup_middleware(app)
-    setup_routes(app)
+    connect_s3(app)
     return app
 
 

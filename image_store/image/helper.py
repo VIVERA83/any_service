@@ -46,15 +46,8 @@ async def s3_stream_image(request: "Request", object_name: str) -> StreamingResp
 
 async def s3_update_image(request: "Request", filename: str):
     for b in await request.app.store.minio.client.list_buckets():
-        print(f"CHECK {b} {filename}")
         if filename == b:
             print(b)
-    # await request.app.store.minio.client.put_object(
-    #     bucket_name=request.app.store.minio.settings.minio_bucket_name,
-    #     object_name=file.filename,
-    #     data=file.file,
-    #     length=file.size,
-    # )
 
 
 def _create_headers(filename: str) -> dict:

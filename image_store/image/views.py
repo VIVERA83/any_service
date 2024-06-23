@@ -19,18 +19,18 @@ async def upload_image(request: "Request", file: UploadFileSchema) -> Any:
     return OkSchema()
 
 
-@image_route.post("/download")
-async def download(request: "Request", meme_id: str) -> Any:
-    return await s3_stream_image(request, meme_id)
+@image_route.post("/download/{meme_id}")
+async def download(request: "Request", meme_id: UUID) -> Any:
+    return await s3_stream_image(request, str(meme_id))
 
 
-@image_route.delete("/delete")
-async def delete(request: "Request", file_name: str) -> Any:
-    await s3_delete_image(request, file_name)
+@image_route.delete("/delete/{meme_id}")
+async def delete(request: "Request", meme_id: UUID) -> Any:
+    await s3_delete_image(request, str(meme_id))
     return OkSchema()
 
 
-@image_route.put("/update")
+@image_route.put("/update/{meme_id}")
 async def update(request: "Request", meme_id: UUID) -> Any:
-    await s3_update_image(request, meme_id.hex)
+    await s3_update_image(request, str(meme_id))
     return OkSchema()

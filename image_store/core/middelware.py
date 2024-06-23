@@ -58,8 +58,7 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
                 error,
                 request.url,
                 request.app.logger,
-                self.settings.is_traceback,
-                getattr(error, "status_code", None),
+                self.settings.traceback,
             )
 
     @staticmethod

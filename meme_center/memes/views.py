@@ -70,22 +70,25 @@ async def add_meme(
 
 
 @memes_route.put("/{id}", summary="обновить мем", response_model=OkSchema)
-async def update_mem(
+async def update_meme(
         request: "Request",
-        meme_id: MEME_ID,
+        id: UUID,
         text: Annotated[str, Form()] = None,
         file: Annotated[UploadFileSchema, File()] = None,
 ) -> Any:
     if text:
-        await request.app.store.memes.update_meme(meme_id.hex, text)
+        await request.app.store.memes.update_meme(id.hex, text)
     if file:
-        await request.app.store.s3.upload(str(meme_id), file.file.read())
+        await request.app.store.s3.upload(str(id), file.file.read())
 
-    return OkSchema(message="Мем успешно облаплен, id: " + str(meme_id))
+    return OkSchema(message="Мем успешно облаплен, id: " + str(id))
 
 
 @memes_route.delete("/{id}", summary="удалить мем", response_model=OkSchema)
-async def delete_mem(request: "Request", id: UUID, ) -> Any:
+async def delete_mem(
+        request: "Request",
+        id: UUID,
+) -> Any:
     await request.app.store.s3.delete(str(id))
     await request.app.store.memes.delete_meme(id)
     return OkSchema(message="Мем успешно удалён, id: " + str(id))

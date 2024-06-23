@@ -30,26 +30,23 @@ def exception_handler(func):
 
 
 class S3Accessor(BaseAccessor):
-    BASE_PATH: str = "127.0.0.1"
-    settings: S3Settings = None
+    BASE_PATH: str
+    settings: S3Settings
 
     @exception_handler
     async def upload(self, filename: str, file_content: bytes):
         async with self.session() as session:
             async with session.post(
-                url=ic(self.__create_url("upload")),
+                url=self.__create_url("upload"),
                 data=self.__create_form_data(filename, file_content),
-            ) as response:
-                print(response.status)
+            ):
                 await session.close()
-        ic("File uploaded")
 
     @exception_handler
     async def download(self, meme_id: str):
         session = self.session()
-        response = await session.post(
-            url=self.__create_url("download", meme_id=meme_id)
-        )
+        self.logger.info(self.__create_url(f"download/{meme_id}"))
+        response = await session.post(url=self.__create_url(f"download/{meme_id}"))
         if response.status != 200:
             raise S3FileNotFoundException()
 
@@ -63,11 +60,13 @@ class S3Accessor(BaseAccessor):
     @exception_handler
     async def delete(self, meme_id: str):
         async with self.session() as session:
-            await session.delete(url=self.__create_url("delete", meme_id=meme_id))
+            await session.delete(url=self.__create_url(f"delete/{meme_id}"))
 
     async def connect(self):
         self.settings = S3Settings()
         self.BASE_PATH = f"http://{self.settings.s3_host}:{self.settings.s3_port}/"
+        self.logger.info(self.BASE_PATH)
+        self.logger.info(f"{self.__class__.__name__} connected")
 
     @staticmethod
     def session() -> aiohttp.ClientSession:
