@@ -73,12 +73,14 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
         detail = "{message}, See the documentation: http://{host}:{port}{uri}"  # noqa
         message = "Not Found"
         status_code = status.HTTP_404_NOT_FOUND
+
         for route in request.app.routes:
             if re.match(route.path_regex, request.url.path):
                 if request.method.upper() in route.methods:
                     return True
             status_code = status.HTTP_405_METHOD_NOT_ALLOWED
             message = "Method Not Allowed"
+        ic()
         raise HTTPException(
             status_code,
             detail.format(
@@ -102,10 +104,21 @@ async def validation_exception_handler(
     Returns:
         JSONResponse: A JSON response with the error details.
     """
+    ic(exc.args)
+    message = ""
+    for data_error in exc.errors():
+        if data_error.get("type", "") == "missing":
+            if message:
+                message += ", "
+            message += f"Пропущен обязательный параметр: {data_error.get('loc')[1]}"
+
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content=jsonable_encoder(
-            {"detail": "Bad request", "message": exc.errors()[0].get("msg")}
+            {
+                "detail": "Bad request",
+                "message": message or "Введены некорректные данные",
+            }
         ),
     )
 

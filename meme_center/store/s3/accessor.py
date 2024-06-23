@@ -1,16 +1,69 @@
 from urllib.parse import urlencode
 
 import aiohttp
-from starlette.responses import StreamingResponse
 
 from base.base_accessor import BaseAccessor
 from core.settings import S3Settings
 from icecream import ic
 
+from store.s3.exeptions import (
+    S3FileNotFoundException,
+    S3ConnectionErrorException,
+    S3UnknownException,
+)
+
+
+def exception_handler(func):
+    async def wrapper(self, *args, **kwargs):
+        try:
+            return await func(self, *args, **kwargs)
+        except IOError as e:
+            if e.errno == 111:
+                raise S3ConnectionErrorException(exception=e)
+            raise S3UnknownException(exception=e)
+        except S3FileNotFoundException as e:
+            raise e
+        except Exception as e:
+            raise S3UnknownException(exception=e)
+
+    return wrapper
+
 
 class S3Accessor(BaseAccessor):
     BASE_PATH: str = "127.0.0.1"
     settings: S3Settings = None
+
+    @exception_handler
+    async def upload(self, filename: str, file_content: bytes):
+        async with self.session() as session:
+            async with session.post(
+                url=ic(self.__create_url("upload")),
+                data=self.__create_form_data(filename, file_content),
+            ) as response:
+                print(response.status)
+                await session.close()
+        ic("File uploaded")
+
+    @exception_handler
+    async def download(self, meme_id: str):
+        session = self.session()
+        response = await session.post(
+            url=self.__create_url("download", meme_id=meme_id)
+        )
+        if response.status != 200:
+            raise S3FileNotFoundException()
+
+        async def stream_iterator():
+            async for chunk in response.content:
+                yield chunk
+            await session.close()
+
+        return stream_iterator()
+
+    @exception_handler
+    async def delete(self, meme_id: str):
+        async with self.session() as session:
+            await session.delete(url=self.__create_url("delete", meme_id=meme_id))
 
     async def connect(self):
         self.settings = S3Settings()
@@ -45,37 +98,6 @@ class S3Accessor(BaseAccessor):
             content_type=content_type,
         )
         return data
-
-    async def upload(self, filename: str, file_content: bytes):
-        async with self.session() as session:
-            async with session.post(
-                url=ic(self.__create_url("upload")),
-                data=self.__create_form_data(filename, file_content),
-            ):
-                await session.close()
-
-    async def download(self, meme_id: str):
-        session = self.session()
-        response = await session.post(
-            url=self.__create_url("download", meme_id=meme_id)
-        )
-
-        async def stream_iterator():
-            async for chunk in response.content:
-                yield chunk
-            await session.close()
-
-        if response.status != 200:
-            raise KeyError((await response.json()).get("message"))
-        return StreamingResponse(
-            content=stream_iterator(),
-            headers=self._create_headers(meme_id + ".jpg"),
-        )
-
-    async def delete(self, meme_id: str):
-        session = self.session()
-        await session.delete(url=self.__create_url("delete", meme_id=meme_id))
-        await session.close()
 
     @staticmethod
     def _create_headers(filename: str) -> dict:

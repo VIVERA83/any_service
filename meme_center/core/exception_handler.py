@@ -5,6 +5,7 @@ from base.base_helper import HTTP_EXCEPTION, LOG_LEVEL
 from httpcore import URL
 from starlette import status
 from starlette.responses import JSONResponse
+from starlette.exceptions import HTTPException
 
 
 class ExceptionHandler:
@@ -101,9 +102,14 @@ class ExceptionHandler:
         It sets the status code, message, and level based on the exception.
         """
 
+        if isinstance(self.exception, HTTPException):
+            self.status_code = self.exception.status_code
+            self.message = self.exception.detail
+            return
+
+        self.status_code = status.HTTP_400_BAD_REQUEST
         if self.exception.args:
             self.message = self.exception.args[0]
-            # self.status_code = status.HTTP_400_BAD_REQUEST
         self.real_message = self.exception.__class__.__name__
         if ex := getattr(self.exception, "exception", False):
             self.real_message = (

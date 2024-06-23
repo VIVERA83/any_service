@@ -1,7 +1,7 @@
 class ExceptionBase(Exception):
     """Базовый класс исключений"""
 
-    args = "Unknown exception..."
+    args = "Неизвестная ошибка"
     exception = None
 
     def __init__(self, *args, exception: Exception = None):
@@ -11,4 +11,4 @@ class ExceptionBase(Exception):
             self.exception = exception
 
     def __str__(self):
-        return f"Exception: {self.args[0]}"
+        return f"Ошибка: {self.args[0]}"

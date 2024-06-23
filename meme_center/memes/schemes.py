@@ -10,6 +10,13 @@ from pydantic_core import CoreSchema
 from pydantic_core.core_schema import with_info_plain_validator_function
 from starlette.datastructures import UploadFile
 
+from memes.exeptions import (
+    NotSupportedFileTypeException,
+    InvalidFileTypeException,
+    TooLargeFileException,
+    EmptyFileException,
+)
+
 MEME_ID = Annotated[
     UUID,
     Query(
@@ -69,20 +76,16 @@ class UploadFileSchema(UploadFile):
 
         """
         if not isinstance(file, UploadFile):
-            raise ValueError(f"Expected UploadFile, received: {type(file)}")
+            raise EmptyFileException()
 
-        file_size = FileSettings().size
-        if file.size > file_size:
-            max_size = file_size // 1024 // 1024
-            raise ValueError(f"Too large file to upload, maximum size {max_size} MB")
+        if file.size > FileSettings().size:
+            raise TooLargeFileException()
 
         if type_file := filetype.guess(file.file):
             if type_file.extension in ["jpg"]:
                 return file
-            raise ValueError(
-                f"Invalid file type: {type_file.extension}. The `jpg` type is expected."
-            )
-        raise ValueError("Unknown file type")
+            raise InvalidFileTypeException()
+        raise NotSupportedFileTypeException()
 
     @classmethod
     def __get_pydantic_json_schema__(
